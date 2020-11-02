@@ -1,0 +1,26 @@
+.footer{
+    background-color: #333F50;
+    height: 12.5em;
+}
+.img_footer{
+    position:relative;
+    top: 50%;
+    left: 50%;
+    margin-top: 28px;
+    margin-left: -100px;
+}
+.list_menu{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+li {
+    font-size: large;
+    float: left;
+  }
+  
+li a {
+    display: block;
+    padding: 8px;
+}
