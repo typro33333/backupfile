@@ -24,15 +24,27 @@ export default function Orders(props) {
   const date = new Date();
   const datenow = (date.getMonth()+1)+"/"+date.getDate()+ "/" + date.getFullYear();
   const rows = props.data;
-  const lengthBox = function(checked){
-    if(checked.length === 0)
+  const lengthBox = function(){
+    if(props.disableBtnBalance)
       return(<Box p={1} className = {classes.box}>
         <Button startIcon ={<MonetizationOnIcon/>} className={classes.widthbtn} disabled color ="primary" variant="contained">Balance</Button>
+      </Box> )
+    else
+        return(
+        <Box p={1} className = {classes.box}>
+          <Button startIcon ={<MonetizationOnIcon/>} className={classes.widthbtn} onClick={props.handleBalance} color ="primary" variant="contained">Balance</Button>
+        </Box>)
+  }
+  const btnAdd = function(checked){
+    if(checked.length === 0)
+      return(
+      <Box p={1} className = {classes.box}>
+        <Button startIcon ={<LocalOfferIcon style={{fontSize:"19px"}}/>} className={classes.widthbtn} disabled color ="primary" variant="contained">Add Tags</Button>
       </Box> )
     else if(checked.length > 0)
         return(
         <Box p={1} className = {classes.box}>
-          <Button startIcon ={<MonetizationOnIcon/>} className={classes.widthbtn} onClick={props.checkbanlancedd} color ="primary" variant="contained">Balance</Button>
+          <Button startIcon ={<LocalOfferIcon style={{fontSize:"19px"}}/>} className={classes.widthbtn} onClick={props.handleAddTag} color ="primary" variant="contained">Add Tags</Button>
         </Box>)
   }
   const tagg = function(tags){
@@ -112,10 +124,8 @@ export default function Orders(props) {
             ))}
           </TextField>
         </Box>
-        {lengthBox(props.arr_index)}
-        <Box p={1} className = {classes.box}>
-          <Button startIcon ={<LocalOfferIcon style={{fontSize:"19px"}}/>} className={classes.widthbtn} onClick={props.handleAddTag} color ="primary" variant="contained">Add Tags</Button>
-        </Box>
+        {lengthBox()}
+        {btnAdd(props.arr_index)}
         {props.disableBtn? 
         <Box p={1} className = {classes.box}>
           <Button startIcon ={<RefreshIcon/>} className={classes.widthbtn} disabled color ="primary" variant="contained">Checking...</Button>
@@ -154,25 +164,16 @@ export default function Orders(props) {
           {props.changeData? 
           props.list.slice(props.page * props.rowsPerPage, props.page * props.rowsPerPage + props.rowsPerPage).map((row,i) => (
             <TableRow key={i} hover role="checkbox" >
-              {row.status?
               <TableCell> 
               <Checkbox
                 size="small"
                 value = {row.sim_number}
                 name = {i}
                 checked = {row.active}
-                onChange={props.handleCbox}
+                onChange={props.handleCboxSearch}
               />
                 <Link style={{textDecoration:"underline"}} to = {"/sim/"+ to_slug(`${row.sim_number}`)}>{row.sim_number}</Link>
               </TableCell>
-              :
-              <TableCell> 
-              <Checkbox
-                size="small"
-                disabled
-              />
-                <Link style={{textDecoration:"underline"}} to = {"/sim/"+ to_slug(`${row.sim_number}`)}>{row.sim_number}</Link>
-              </TableCell>}
               <TableCell>
                 <Tooltip title = {row.tag} arrow>
                 <Button>
@@ -187,7 +188,6 @@ export default function Orders(props) {
           :
           rows.slice(props.page * props.rowsPerPage, props.page * props.rowsPerPage + props.rowsPerPage).map((row,i) => (
             <TableRow key={i} hover role="checkbox" >
-              {row.status?
               <TableCell>
               <Checkbox
                 size="small"
@@ -198,14 +198,6 @@ export default function Orders(props) {
               />
                 <Link style={{textDecoration:"underline"}} to = {"/sim/"+ to_slug(`${row.sim_number}`)}>{row.sim_number}</Link>
               </TableCell>
-              :
-              <TableCell> 
-              <Checkbox
-                size="small"
-                disabled
-              />
-                <Link style={{textDecoration:"underline"}} to = {"/sim/"+ to_slug(`${row.sim_number}`)}>{row.sim_number}</Link>
-              </TableCell>}
               <TableCell><Tooltip title = {row.tag} arrow><Button>{tagg(row.tag)}</Button></Tooltip></TableCell>
               <TableCell>{checkDate(datenow,row.expire_date)}</TableCell>
               <TableCell>{row.balance} VNĐ</TableCell>
@@ -216,7 +208,7 @@ export default function Orders(props) {
       </Table>
       </TableContainer>
       <TablePagination
-      rowsPerPageOptions ={[5,10,20]}
+      rowsPerPageOptions ={[5]}
       component={Paper}
       count={rows.length}
       page={props.page}

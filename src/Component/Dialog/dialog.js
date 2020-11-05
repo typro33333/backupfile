@@ -20,14 +20,10 @@ export default function AlertDialog(props) {
         <DialogContent>
           {props.table}
           <DialogContentText id="alert-dialog-description">
-          <Box display="flex" flexDirection="row" p={1} m={1}>
             <Box p={1}>
               {props.context}
             </Box>
-            <Box p={1} style ={{marginTop:"12px"}}>
-              {props.btnAdd}
-            </Box>
-          </Box>
+            {props.number}
             {props.alert}
           </DialogContentText>
           <DialogContentText>

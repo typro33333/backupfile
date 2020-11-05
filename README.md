@@ -11,8 +11,13 @@
 To get the frontend running locally:
 
 - Clone this repo
-- `cd fontend-demo5`
+- `cd sms-fontend`
 - `npm install` to install all req'd dependencies.
+
+## Run Project
+
+- `npm start` to start the local server (this project uses create-react-app).
+
 #### Support by [Material-UI](https://material-ui.com/).
 
 <img width="100" src="https://material-ui.com/static/logo_raw.svg"/>

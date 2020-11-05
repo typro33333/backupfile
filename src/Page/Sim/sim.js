@@ -2,9 +2,12 @@ import React from 'react';
 import Dashboard from '../../Component/Dashboard/Appbar/Appbar';
 import Listitems from '../../Component/Users/Sim/listitems_sim';
 import Breadcrum from '../../Component/Breadcrumb/Breadcrumb';
-import {getAllsim,getRefresh,getBalance,postcheckbalance,all_tag_of_sim} from '../../Serviece/Serviece';
+import {getAllsim,getRefresh,getBalance,all_tag_of_sim,add_Tag_for_Sim} from '../../Serviece/Serviece';
 import {currentData} from '../../Module/module_sim';
-
+import DialogAddtag from '../../Component/Dialog/dialog';
+import {Button,TextField} from '@material-ui/core'
+import Chip from '@material-ui/core/Chip';
+import DialogSuccess from '../../Component/SnackBar/sucess';
 export default class Sim extends React.Component{
     constructor(props){
         super(props);
@@ -39,8 +42,10 @@ export default class Sim extends React.Component{
                 {label:'#Tags'}
             ],
             searchDefault:'Phone Number',
-            listPhone:[]
-
+            listPhone:[],
+            open: false,
+            newtitletag:'',
+            openSuccess:false
         }
         this.reactTags = React.createRef()
     }
@@ -111,37 +116,6 @@ export default class Sim extends React.Component{
                 return this.props.history.push('/login')
             }
         });
-        /*for(var i = 0; i<this.state.data.length; i++){
-            this.state.listPhone.push(this.state.data[i].sim_number)
-        }
-        await all_tag_of_sim(this.state.listPhone)
-        .then(res => {
-            var arr =[];
-            const {data} = this.state;
-            for(var i = 0;i<res.length;i++){
-                var tag ='';
-                var sim_number = '';
-                for(var j = 0;j<res[i].length;j++){
-                    tag = (tag+" #"+res[i][j].title);
-                    if(res[i][0].sim_number === undefined || res[i][0].sim_number === null){
-                        
-                    }else{
-                        sim_number = res[i][0].sim_number;
-                    }
-                }
-                arr.push({tag,sim_number});
-            }
-            for(i = 0; i<data.length;i++){
-                if(data[i].sim_number === arr[i].sim_number){
-                    if(arr[i].tag === '#undefined'){
-                        data[i].tag = ''
-                    }
-                    else 
-                        data[i].tag = arr[i].tag
-                }
-            }
-            this.setState({data:data})
-        })*/
         setInterval(async() => {
             await getAllsim().then(async res => {
                 if(res !== ''){
@@ -204,37 +178,9 @@ export default class Sim extends React.Component{
                         dem:dem,
                         dem1:dem1,
                     });
-        await all_tag_of_sim(this.state.listPhone).then(res => {
-            var arr =[];
-            const {data} = this.state;
-            for(var i = 0;i<res.length;i++){
-                var tag ='';
-                var sim_number = '';
-                for(var j = 0;j<res[i].length;j++){
-                    tag = (tag+" #"+res[i][j].title);
-                    if(res[i][0].sim_number === undefined || res[i][0].sim_number === null){
-                        
-                    }else{
-                        sim_number = res[i][0].sim_number;
-                    }
                 }
-                arr.push({tag,sim_number});
-            }
-            for(i = 0; i<data.length;i++){
-                if(data[i].sim_number === arr[i].sim_number){
-                    if(arr[i].tag === ' #undefined'){
-                        data[i].tag = ''
-                    }
-                    else 
-                        data[i].tag = arr[i].tag
-                }
-            }
-            this.setState({data:data})
-        })
-                }
-                return;
             })
-        },10000);
+        },8000);
     }
     handleSearch = async (event) =>{
         await this.setState({
@@ -242,6 +188,8 @@ export default class Sim extends React.Component{
             changeData:true
         });
         this.setState({list:currentData(this.state.data,this.state.search,this.state.statusDefault,this.state.expireDateDefault,this.state.searchDefault)});
+        if(this.state.search === "")
+        this.setState({funcsearch:false});
     }
     handleChangeStatus = async(event) => {
         await this.setState({statusDefault:event.target.value,changeData:true});
@@ -273,24 +221,37 @@ export default class Sim extends React.Component{
         });
     };
     handleCbox = (event) => {
-        var arr = this.state.arr_index;
-        var i = event.target.name;
+        const arr = this.state.arr_index;
         var index = arr.indexOf(event.target.value);
-        const value = event.target.value;
-        var {data} = this.state;
+        var i = event.target.name;
+        const arrdata = this.state.data;
+        if (event.target.checked === true){
+            arrdata[Number(this.state.page) * Number(this.state.rowsPerPage) + Number(i)].active = true;
+            this.setState({data:arrdata});
+            arr.splice(0,0,event.target.value);
+        }
+        else if(index !== -1 || event.target.checked === false) {
+                arrdata[Number(this.state.page) * Number(this.state.rowsPerPage) + Number(i)].active = false;
+                this.setState({data:arrdata})
+                arr.splice(index, 1);
+        }
+        this.setState({arr_indexx:arr});
+    }
+    handleCboxSearch = (event) => {
+        const arr = this.state.arr_index;
+        const listdata = this.state.list;
+        var index = arr.indexOf(event.target.value);
         if(event.target.checked === true){
-            data[Number(this.state.page) * Number(this.state.rowsPerPage) + Number(i)].active = true;
-            this.setState({list:data});
-            arr.push(value);
-            this.setState({changeData:true});
+            listdata[Number(this.state.page) * Number(this.state.rowsPerPage) + Number(event.target.name)].active = true;
+            this.setState({list:listdata});
+            arr.splice(0,0,event.target.value)
         }
         else if(event.target.checked === false){
-            data[Number(this.state.page) * Number(this.state.rowsPerPage) + Number(i)].active = false;
-            this.setState({list:data});
-            arr.splice(index, 1);
-            this.setState({changeData:true});
+            listdata[Number(this.state.page) * Number(this.state.rowsPerPage) + Number(event.target.name)].active = false;
+            this.setState({list:listdata});
+            arr.splice(index,1);
         }
-        this.setState({arr_index:arr});
+        this.setState({arr_indexx:arr});
     }
     handleChangePage = (event,newPage) =>{
         this.setState({page:newPage})
@@ -316,21 +277,57 @@ export default class Sim extends React.Component{
         this.setState({list:data,arr_index:[],data:data})
         }
     }
-    checkbanlancedd =async () => {
-        const {arr_index} =this.state;
-        await postcheckbalance(arr_index).then(res => {
-            if(res)
-                return true;
-        })
-    }
     handleChangeTypeSearch = async (event) => {
         await this.setState({searchDefault:event.target.value});
     }
-    handleAddTag = async () => {
-        
+    handleAddTag = () => {
+        this.setState({open:true});
+    }
+    onClosediglog = (event,reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        this.setState({open:false})
+    }
+    comfirmAddTag = async() => {
+        const {arr_index,newtitletag} = this.state;
+        await add_Tag_for_Sim(newtitletag,arr_index).then(res =>{
+            if(res === true){
+                this.setState({open:false,newtitletag:'',openSuccess:true})
+                setTimeout(()=>this.setState({openSuccess:false}),8000);
+                return
+            }
+        })
+    }
+    TitleTag = (event) => {
+        this.setState({newtitletag:event.target.value});
+    }
+    handleClose = () => {
+        this.setState({openSuccess:false})
     }
     render()
     {  
+        const ConfigText = {
+            label:"New Tag title",
+            placeholder:"Input new Tag",
+            fullWidth:true,
+        }
+        const Chipnumber = () => {
+            const {arr_index} = this.state;
+            return arr_index.map((row,i) => (
+                    <Chip key={i} label={`${i+1}: +84.${row}`} style={{margin:"2px"}}/>
+            ))
+        }
+        const dymaticDiglog = {
+            title: "Add new #tag",
+            maxWidth : 'xs',
+            fullWidth : true,
+            btnClose: <Button  color ="primary" onClick ={()=>{this.setState({open:false})}}>Close</Button>,
+            btnCofirm: <Button  color ="primary" onClick ={this.comfirmAddTag}>Comfirm</Button>,
+            context:`- List Sim has been seleted:`,
+            number: Chipnumber(),
+            context1: <TextField {...ConfigText} onChange = {this.TitleTag}/>
+        }
         const state = {
             data : this.state.data,
             list : this.state.list,
@@ -346,7 +343,9 @@ export default class Sim extends React.Component{
             rowsPerPage:this.state.rowsPerPage,
             arr_index:this.state.arr_index,
             typesearch:this.state.typesearch,
-            searchDefault:this.state.searchDefault
+            searchDefault:this.state.searchDefault,
+            open:this.state.open,
+
         }
         const titlebreadcrum = {
             title:"Home",
@@ -361,15 +360,18 @@ export default class Sim extends React.Component{
             handleCbox:this.handleCbox,
             handleChangePage:this.handleChangePage,
             handleCboxAll:this.handleCboxAll,
-            checkbanlancedd:this.checkbanlancedd,
             handleChangeTypeSearch:this.handleChangeTypeSearch,
             handleAddTag:this.handleAddTag,
+            onClosediglog:this.onClosediglog,
+            handleCboxSearch:this.handleCboxSearch
         }
         let listitems = <Listitems {...handle} {...state}/>
         return(
             <div>
                 <Dashboard  
-                table = {listitems} 
+                table = {listitems}
+                table_2 = {<DialogAddtag {...state} {...handle} {...dymaticDiglog}/>}
+                table_3 = {<DialogSuccess open = {this.state.openSuccess} titlesuccess="Add Tag complete" handleClose={this.handleClose}/>}
                 breadcrumb = {<Breadcrum {...titlebreadcrum}/>}
                 />
             </div>

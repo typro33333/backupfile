@@ -519,8 +519,19 @@ export const all_tag_of_sim = async(list_number) => {
 }
 
 //Sim/{sim_number}/AddTag
-export const add_Tag_for_Sim = (tag) => {
-   return fetch("") 
+export const add_Tag_for_Sim = (title,sim) => {
+   return fetch("http://localhost:8000/sim/add_tag?tag_title="+title,{
+       method:"POST",
+       headers:{
+        'Authorization': sessionStorage.getItem('token')
+       },
+       body:JSON.stringify(sim)
+   }).then(res => {
+       if(res.ok){
+           return true;
+       }
+       return false;
+   })
 }
 
 ////////////////////////////////////////////////
