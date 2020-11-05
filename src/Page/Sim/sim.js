@@ -180,7 +180,7 @@ export default class Sim extends React.Component{
                     });
                 }
             })
-        },8000);
+        },2000);
     }
     handleSearch = async (event) =>{
         await this.setState({

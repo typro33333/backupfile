@@ -34,7 +34,16 @@ export function currentData(data,query,status,expiredate,typesearch){
 
 function searchtag(data,query){
     const filterItems = (data, query) => {
-        return data.filter(el =>el.tag.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+        var arr = query.split('#')
+        var b = [];
+        for(let i = 1; i < arr.length;i++){
+            data.forEach(ai=>{
+                if((ai.tag.toLowerCase().indexOf(arr[i].toLowerCase()) !== -1)&&(b.filter(bi=>bi.sim_number===ai.sim_number).length===0)){
+                    b.push(ai);
+                }
+            })
+        }
+        return b;
     }
     if(query !== ''){
         return filterItems(data,query);
