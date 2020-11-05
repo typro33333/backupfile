@@ -21,7 +21,6 @@ export default function Buttonn(props){
     const responseGoogle = async (response) => {
       console.log(response);
       var token = response.tokenId;
-      console.log(token);
       const url = "http://localhost:8000/login/gmail/access-token?google_token_id="+token
       const res = await fetch(url);
       if(res.status === 200){

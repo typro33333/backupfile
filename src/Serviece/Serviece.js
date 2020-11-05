@@ -486,6 +486,43 @@ export const getallTag = (number) => {
     })
 }
 
+//Sim//{Sim_number}//Delete_Url
+export const delete_Urls_Of_Sim = (url) => {
+    return fetch("http://localhost:8000/url/delete-url-of-sim",{
+        method:'POST',
+        headers:{
+            'Authorization': sessionStorage.getItem('token')
+        },
+        body:JSON.stringify(url)
+    }).then(async res => {
+        if(res.ok)
+            return true
+        else if (res.status === 502)
+            console.log(await res.json())
+    })
+}
+
+//Sim//{Sim_number}/All_tag
+export const all_tag_of_sim = async(list_number) => {
+    var tag =[];
+    for(var i=0; i < list_number.length;i++){
+        await axios("/sim/"+list_number[i]+"/all_tag",{
+            headers:{
+                'Authorization': sessionStorage.getItem('token')
+            },
+        }).then(async res =>{
+            if(res.status === 200)
+                await tag.push(res.data)
+        });
+    }
+    return tag;
+}
+
+//Sim/{sim_number}/AddTag
+export const add_Tag_for_Sim = (tag) => {
+   return fetch("") 
+}
+
 ////////////////////////////////////////////////
 
 //Url//getall

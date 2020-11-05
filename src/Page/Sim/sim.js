@@ -2,7 +2,7 @@ import React from 'react';
 import Dashboard from '../../Component/Dashboard/Appbar/Appbar';
 import Listitems from '../../Component/Users/Sim/listitems_sim';
 import Breadcrum from '../../Component/Breadcrumb/Breadcrumb';
-import {getAllsim,getRefresh,getBalance,postcheckbalance} from '../../Serviece/Serviece';
+import {getAllsim,getRefresh,getBalance,postcheckbalance,all_tag_of_sim} from '../../Serviece/Serviece';
 import {currentData} from '../../Module/module_sim';
 
 export default class Sim extends React.Component{
@@ -38,7 +38,8 @@ export default class Sim extends React.Component{
                 {label:'Phone Number'},
                 {label:'#Tags'}
             ],
-            searchDefault:'Phone Number'
+            searchDefault:'Phone Number',
+            listPhone:[]
 
         }
         this.reactTags = React.createRef()
@@ -46,14 +47,14 @@ export default class Sim extends React.Component{
     async componentDidMount(){
         document.title = 'Epsilo | Sim';
         const token = sessionStorage.getItem('token');
-        if(token === null)
+        if(token === null){
             return this.props.history.push('/login')
-        await getAllsim().then(res => {
+        }
+        await getAllsim().then(async res => {
             if(res !== ''){
                 res.forEach(element => {
                     element.active = false
                 });
-                console.log(res)
                 var dem = 0;
                 var dem1 =0;
                 for(var i = 0; i < res.length;i++){
@@ -68,8 +69,38 @@ export default class Sim extends React.Component{
                     if(res[i].sim_number === "False")
                         res.splice(i,1)
                 }
-                if(res.length === dem || res.length === dem1)
+                if(res.length === dem || res.length === dem1){
                     this.setState({disableBtn:true,disableBtnBalance:true})
+                }
+                for( i = 0; i<res.length; i++){
+                    this.state.listPhone.push(res[i].sim_number)
+                }
+                const arr = await all_tag_of_sim(this.state.listPhone).then(res =>{
+                    var arr =[];
+                    for(var i = 0;i<res.length;i++){
+                        var tag ='';
+                        var sim_number = '';
+                        for(var j = 0;j<res[i].length;j++){
+                            tag = (tag+" #"+res[i][j].title);
+                            if(res[i][0].sim_number === undefined || res[i][0].sim_number === null){
+                                
+                            }else{
+                                sim_number = res[i][0].sim_number;
+                            }
+                        }
+                        arr.push({tag,sim_number});
+                    }
+                    return arr;
+                })
+                for(i = 0; i<res.length;i++){
+                    if(res[i].sim_number === arr[i].sim_number){
+                        if(arr[i].tag === ' #undefined'){
+                            res[i].tag = ''
+                        }
+                        else 
+                            res[i].tag = arr[i].tag
+                    }
+                }
                 this.setState({
                     data:res,
                     dem:dem,
@@ -80,6 +111,37 @@ export default class Sim extends React.Component{
                 return this.props.history.push('/login')
             }
         });
+        /*for(var i = 0; i<this.state.data.length; i++){
+            this.state.listPhone.push(this.state.data[i].sim_number)
+        }
+        await all_tag_of_sim(this.state.listPhone)
+        .then(res => {
+            var arr =[];
+            const {data} = this.state;
+            for(var i = 0;i<res.length;i++){
+                var tag ='';
+                var sim_number = '';
+                for(var j = 0;j<res[i].length;j++){
+                    tag = (tag+" #"+res[i][j].title);
+                    if(res[i][0].sim_number === undefined || res[i][0].sim_number === null){
+                        
+                    }else{
+                        sim_number = res[i][0].sim_number;
+                    }
+                }
+                arr.push({tag,sim_number});
+            }
+            for(i = 0; i<data.length;i++){
+                if(data[i].sim_number === arr[i].sim_number){
+                    if(arr[i].tag === '#undefined'){
+                        data[i].tag = ''
+                    }
+                    else 
+                        data[i].tag = arr[i].tag
+                }
+            }
+            this.setState({data:data})
+        })*/
         setInterval(async() => {
             await getAllsim().then(async res => {
                 if(res !== ''){
@@ -110,16 +172,69 @@ export default class Sim extends React.Component{
                             disableBtnBalance:true,
                         })
                     }
+                    const arr = await all_tag_of_sim(this.state.listPhone).then(res =>{
+                        var arr =[];
+                        for(var i = 0;i<res.length;i++){
+                            var tag ='';
+                            var sim_number = '';
+                            for(var j = 0;j<res[i].length;j++){
+                                tag = (tag+" #"+res[i][j].title);
+                                if(res[i][0].sim_number === undefined || res[i][0].sim_number === null){
+                                    
+                                }else{
+                                    sim_number = res[i][0].sim_number;
+                                }
+                            }
+                            arr.push({tag,sim_number});
+                        }
+                        return arr;
+                    })
+                    for(i = 0; i<res.length;i++){
+                        if(res[i].sim_number === arr[i].sim_number){
+                            if(arr[i].tag === ' #undefined'){
+                                res[i].tag = ''
+                            }
+                            else 
+                                res[i].tag = arr[i].tag
+                        }
+                    }
                     this.setState({
                         data:res,
                         dataLocal:res,
                         dem:dem,
                         dem1:dem1,
                     });
+        await all_tag_of_sim(this.state.listPhone).then(res => {
+            var arr =[];
+            const {data} = this.state;
+            for(var i = 0;i<res.length;i++){
+                var tag ='';
+                var sim_number = '';
+                for(var j = 0;j<res[i].length;j++){
+                    tag = (tag+" #"+res[i][j].title);
+                    if(res[i][0].sim_number === undefined || res[i][0].sim_number === null){
+                        
+                    }else{
+                        sim_number = res[i][0].sim_number;
+                    }
+                }
+                arr.push({tag,sim_number});
+            }
+            for(i = 0; i<data.length;i++){
+                if(data[i].sim_number === arr[i].sim_number){
+                    if(arr[i].tag === ' #undefined'){
+                        data[i].tag = ''
+                    }
+                    else 
+                        data[i].tag = arr[i].tag
+                }
+            }
+            this.setState({data:data})
+        })
                 }
                 return;
             })
-        }, 3000);
+        },10000);
     }
     handleSearch = async (event) =>{
         await this.setState({
@@ -211,8 +326,11 @@ export default class Sim extends React.Component{
     handleChangeTypeSearch = async (event) => {
         await this.setState({searchDefault:event.target.value});
     }
+    handleAddTag = async () => {
+        
+    }
     render()
-    {   console.log(this.state.data)
+    {  
         const state = {
             data : this.state.data,
             list : this.state.list,
@@ -244,7 +362,8 @@ export default class Sim extends React.Component{
             handleChangePage:this.handleChangePage,
             handleCboxAll:this.handleCboxAll,
             checkbanlancedd:this.checkbanlancedd,
-            handleChangeTypeSearch:this.handleChangeTypeSearch
+            handleChangeTypeSearch:this.handleChangeTypeSearch,
+            handleAddTag:this.handleAddTag,
         }
         let listitems = <Listitems {...handle} {...state}/>
         return(

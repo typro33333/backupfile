@@ -25,11 +25,21 @@ export function currentData(data,query,status,expiredate,typesearch){
         arr = search(data,query);
     }
     else if(typesearch === '#Tags'){
-        arr = search(data,query);
+        arr = searchtag(data,query);
     }
     arr = filterStatus(arr,status);
     arr = filterExpireDate(arr,expiredate);
     return arr;
+}
+
+function searchtag(data,query){
+    const filterItems = (data, query) => {
+        return data.filter(el =>el.tag.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    }
+    if(query !== ''){
+        return filterItems(data,query);
+    }
+    return data;
 }
 
 function search(data,query){

@@ -1,6 +1,5 @@
 import React from 'react';
 import Logo from '../Login/Logo';
-//import Title from '../Login/Title';
 import Button from '../Login/Button';
 import { makeStyles } from '@material-ui/core/styles';
 

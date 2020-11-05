@@ -220,7 +220,7 @@ export default function Dashboard(props) {
         <Box className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           {props.breadcrumb}
-               {props.table}
+          {props.table}
           {props.table_2}
           {props.table_3}
         </Container>

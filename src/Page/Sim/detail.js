@@ -8,7 +8,8 @@ import Breadcrumdetail from '../../Component/Breadcrumb/Breadcrumb_details';
 import Tabs from '../../Component/Tabs/tabs';
 import ListURLOFSIM from '../../Component/Users/Sim/url_sim';
 import {searchurl} from '../../Module/module_sim';
-import {getAllRawmessage,getAllurlofsim,getAllurlNotInsim,postUrltosim} from '../../Serviece/Serviece';
+import {getAllRawmessage,getAllurlofsim,getAllurlNotInsim,postUrltosim,delete_Urls_Of_Sim} from '../../Serviece/Serviece';
+import DialogSuccess from '../../Component/SnackBar/sucess';
 class SimDetail extends React.Component{
     static propTypes = {
         match: PropTypes.object.isRequired
@@ -27,6 +28,8 @@ class SimDetail extends React.Component{
             arr_indexx:[],
             page:0,
             rowsPerPage:10,
+            openSuccess:false,
+            titleSnackbar:''
         }
     }
     async componentDidMount(){
@@ -79,7 +82,14 @@ class SimDetail extends React.Component{
                         this.setState({data_url:res})
                     }
                 })
-                this.setState({openDialog:false,arr_index:[]})
+                this.setState({
+                    openDialog:false,
+                    arr_index:[],
+                    openSuccess:true,
+                    titleSnackbar:'Add url complete!',
+                    list:this.state.data_url
+                });
+                setTimeout(()=>this.setState({openSuccess:false}),8000);
             }
         })
     }
@@ -139,8 +149,32 @@ class SimDetail extends React.Component{
         this.setState({rowsPerPage:parseInt(event.target.value,10)});
         this.setState({page:0});
     }
-    handledelete = () => {
-        
+    handledelete = async() => {
+        const {match} = this.props;
+        const {arr_indexx} = this.state;
+        var url = {
+            "sim":[match.params.id],
+            "url":arr_indexx
+        }
+        await delete_Urls_Of_Sim(url).then(async res =>{
+            if(res){
+                await getAllurlofsim(match.params.id).then(res =>{
+                    if(res !==''){
+                        res.forEach(element => {
+                            element.active = false
+                        });
+                        this.setState({data_url:res})
+                    }
+                })
+                this.setState({openSuccess:true,arr_indexx:[],titleSnackbar:"Delete url complete!",list:this.state.data_url});
+                setTimeout(()=>this.setState({openSuccess:false}),8000);
+            }
+        })
+    }
+    handleClose = (event,reason) => {
+        if (reason === 'clickaway')
+            return;
+        this.setState({openSuccess:false})
     }
     render()
     { 
@@ -162,7 +196,8 @@ class SimDetail extends React.Component{
             rowsPerPage:this.state.rowsPerPage,
             page:this.state.page,
             arr_indexx:this.state.arr_indexx,
-            tags:this.state.tags,
+            open:this.state.openSuccess,
+            titlesuccess:this.state.titleSnackbar
         }
         const handle = {
             handleaddurl:this.handleaddurl,
@@ -175,6 +210,7 @@ class SimDetail extends React.Component{
             handleChangePage:this.handleChangePage,
             handleChangeRowsPerPage:this.handleChangeRowsPerPage,
             handledelete:this.handledelete,
+            handleClose:this.handleClose
         }
         const props = {
             item_1: <ListDetail number = {number} {...state} {...handle}/>,
@@ -185,6 +221,7 @@ class SimDetail extends React.Component{
         return(
                 <Dashboard 
                 table =  {<Tabs {...props}/>}
+                table_2 = {<DialogSuccess {...state} {...handle}/>}
                 breadcrumb = {<Breadcrumdetail {...titleBreadCrum}/>}/> 
         )
     }

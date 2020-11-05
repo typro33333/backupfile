@@ -16,6 +16,9 @@ import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import DateRangeIcon from '@material-ui/icons/DateRange';
 import PowerSettingsNewIcon from '@material-ui/icons/PowerSettingsNew';
 import {status,checkDate} from '../../../Module/module_sim';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
+import Tooltip from '@material-ui/core/Tooltip';
+
 export default function Orders(props) {
   const classes = useStyles();
   const date = new Date();
@@ -31,6 +34,12 @@ export default function Orders(props) {
         <Box p={1} className = {classes.box}>
           <Button startIcon ={<MonetizationOnIcon/>} className={classes.widthbtn} onClick={props.checkbanlancedd} color ="primary" variant="contained">Balance</Button>
         </Box>)
+  }
+  const tagg = function(tags){
+    var word = tags.split('#');
+    if(word[1] === undefined)
+      return '#'
+    return '#'+ word[1];
   }
   return (
     <React.Fragment>
@@ -104,6 +113,9 @@ export default function Orders(props) {
           </TextField>
         </Box>
         {lengthBox(props.arr_index)}
+        <Box p={1} className = {classes.box}>
+          <Button startIcon ={<LocalOfferIcon style={{fontSize:"19px"}}/>} className={classes.widthbtn} onClick={props.handleAddTag} color ="primary" variant="contained">Add Tags</Button>
+        </Box>
         {props.disableBtn? 
         <Box p={1} className = {classes.box}>
           <Button startIcon ={<RefreshIcon/>} className={classes.widthbtn} disabled color ="primary" variant="contained">Checking...</Button>
@@ -124,8 +136,8 @@ export default function Orders(props) {
             />
               Phone Number
             </TableCell>
-            <TableCell style={{width:"170px"}}>
-              Tag  
+            <TableCell style={{}}>
+              <LocalOfferIcon style={{fontSize:"24px",position:'absolute',left:"55px"}}/> #Tag  
             </TableCell>
             <TableCell>
               <DateRangeIcon style={{fontSize:"24px",position:'absolute',left:"100px"}}/> Expire Date  
@@ -161,7 +173,12 @@ export default function Orders(props) {
               />
                 <Link style={{textDecoration:"underline"}} to = {"/sim/"+ to_slug(`${row.sim_number}`)}>{row.sim_number}</Link>
               </TableCell>}
-              <TableCell>#Tag</TableCell>
+              <TableCell>
+                <Tooltip title = {row.tag} arrow>
+                <Button>
+                  {tagg(row.tag)}
+                </Button>
+              </Tooltip></TableCell>
               <TableCell>{checkDate(datenow,row.expire_date)}</TableCell>
               <TableCell>{row.balance} VNĐ</TableCell>
               <TableCell>{status(row.status)}</TableCell>
@@ -170,7 +187,8 @@ export default function Orders(props) {
           :
           rows.slice(props.page * props.rowsPerPage, props.page * props.rowsPerPage + props.rowsPerPage).map((row,i) => (
             <TableRow key={i} hover role="checkbox" >
-              {row.status?<TableCell> 
+              {row.status?
+              <TableCell>
               <Checkbox
                 size="small"
                 value = {row.sim_number}
@@ -188,7 +206,7 @@ export default function Orders(props) {
               />
                 <Link style={{textDecoration:"underline"}} to = {"/sim/"+ to_slug(`${row.sim_number}`)}>{row.sim_number}</Link>
               </TableCell>}
-              <TableCell>#Tag</TableCell>
+              <TableCell><Tooltip title = {row.tag} arrow><Button>{tagg(row.tag)}</Button></Tooltip></TableCell>
               <TableCell>{checkDate(datenow,row.expire_date)}</TableCell>
               <TableCell>{row.balance} VNĐ</TableCell>
               <TableCell>{status(row.status)}</TableCell>
